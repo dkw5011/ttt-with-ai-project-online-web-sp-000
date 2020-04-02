@@ -1,25 +1,44 @@
 class Game
   require 'pry'
-  attr_accessor :board, :player
-  attr_writer :cells
+  attr_accessor :board, :player_1, :player_2, :token
+  
   WIN_COMBINATIONS = [[0,1,2],[3,4,5],[6,7,8],[0,4,8],[2,4,6],[0,3,6],[1,4,7],[2,5,8]]
   
-  def initialize(player_1 = "X", player_2 = "O")
+  def initialize(player_1 = Players::Human.new("X"), player_2 = Players::Human.new("O"), board = Board.new)
     @player_1 = player_1
     @player_2 = player_2
+    @board = board
 end
 
-  def board
-    @board
+def turn
+puts "Please take your turn"  
+player = current_player
+input = player.move(board)
+if input.to_i.between?(0,8) == "false"
+  turn
+else
+  puts "Turn: #{@board.turn_count+1}\n"
+      @board.display
+      @board.update(input, player)
+      puts "#{player.token} moved #{input}"
+      @board.display
+      puts "\n\n"
+end
+end
+
+def move(input)
+      board.cells[input.to_i] = current_player
+    end
+    
+def turn_count
+    count = 0
+    board.cells.each do |space|
+      if space == "X" || space == "O"
+        count += 1
+      end
   end
-  
-  def player_1
-    @player
-  end
-  
-  def player_2
-    @player
-  end
+  count
+end
   
   def won?
 top_row_win = [0,1,2]
@@ -30,48 +49,59 @@ middle_column_win = [1,4,7]
 right_column_win = [2,5,8]
 left_diagonal_win = [0,4,8]
 right_diagonal_win = [2,4,6]
-if board[top_row_win[0]] == "X" && board[top_row_win[1]] == "X" && board[top_row_win[2]] == "X" || board[top_row_win[0]] == "O" && board[top_row_win[1]] == "O" && board[top_row_win[2]] == "O"
+if board.cells[top_row_win[0]] == "X" && board.cells[top_row_win[1]] == "X" && board.cells[top_row_win[2]] == "X" || board.cells[top_row_win[0]] == "O" && board.cells[top_row_win[1]] == "O" && board.cells[top_row_win[2]] == "O"
   WIN_COMBINATIONS[0]
- elsif board[middle_row_win[0]] == "X" && board[middle_row_win[1]] == "X" && board[middle_row_win[2]] == "X" || board[middle_row_win[0]] == "O" && board[middle_row_win[1]] == "O" && board[middle_row_win[2]] == "O"
+
+  
+ elsif board.cells[middle_row_win[0]] == "X" && board.cells[middle_row_win[1]] == "X" && board.cells[middle_row_win[2]] == "X" || board.cells[middle_row_win[0]] == "O" && board.cells[middle_row_win[1]] == "O" && board.cells[middle_row_win[2]] == "O"
    WIN_COMBINATIONS[1]
    
-elsif board[bottom_row_win[0]] == "X" && board[bottom_row_win[1]] == "X" && board[bottom_row_win[2]] == "X" || board[bottom_row_win[0]] == "O" && board[bottom_row_win[1]] == "O" && board[bottom_row_win[2]] == "O"
+elsif board.cells[bottom_row_win[0]] == "X" && board.cells[bottom_row_win[1]] == "X" && board.cells[bottom_row_win[2]] == "X" || board.cells[bottom_row_win[0]] == "O" && board.cells[bottom_row_win[1]] == "O" && board.cells[bottom_row_win[2]] == "O"
     WIN_COMBINATIONS[2]
     
-elsif board[left_column_win[0]] == "X" && board[left_column_win[1]] == "X" && board[left_column_win[2]] == "X" || board[left_column_win[0]] == "O" && board[left_column_win[1]] == "O" && board[left_column_win[2]] == "O"
+elsif board.cells[left_column_win[0]] == "X" && board.cells[left_column_win[1]] == "X" && board.cells[left_column_win[2]] == "X" || board.cells[left_column_win[0]] == "O" && board.cells[left_column_win[1]] == "O" && board.cells[left_column_win[2]] == "O"
     WIN_COMBINATIONS[5]
     
-elsif board[middle_column_win[0]] == "X" && board[middle_column_win[1]] == "X" && board[middle_column_win[2]] == "X" || board[middle_column_win[0]] == "O" && board[middle_column_win[1]] == "O" && board[middle_column_win[2]] == "O"
+elsif board.cells[middle_column_win[0]] == "X" && board.cells[middle_column_win[1]] == "X" && board.cells[middle_column_win[2]] == "X" || board.cells[middle_column_win[0]] == "O" && board.cells[middle_column_win[1]] == "O" && board.cells[middle_column_win[2]] == "O"
     WIN_COMBINATIONS[6]
     
-elsif self.board[right_column_win[0]] == "X" && self.board[right_column_win[1]] == "X" && self.board[right_column_win[2]] == "X" || self.board[right_column_win[0]] == "O" && self.board[right_column_win[1]] == "O" && self.board[right_column_win[2]] == "O"
+elsif board.cells[right_column_win[0]] == "X" && board.cells[right_column_win[1]] == "X" && board.cells[right_column_win[2]] == "X" || board.cells[right_column_win[0]] == "O" && board.cells[right_column_win[1]] == "O" && board.cells[right_column_win[2]] == "O"
     WIN_COMBINATIONS[7]
 
-elsif board[left_diagonal_win[0]] == "X" && board[left_diagonal_win[1]] == "X" && board[left_diagonal_win[2]] == "X" || board[left_diagonal_win[0]] == "O" && board[left_diagonal_win[1]] == "O" && board[left_diagonal_win[2]] == "O"
+elsif board.cells[left_diagonal_win[0]] == "X" && board.cells[left_diagonal_win[1]] == "X" && board.cells[left_diagonal_win[2]] == "X" || board.cells[left_diagonal_win[0]] == "O" && board.cells[left_diagonal_win[1]] == "O" && board.cells[left_diagonal_win[2]] == "O"
     WIN_COMBINATIONS[3]
     
-elsif board[right_diagonal_win[0]] == "X" && board[right_diagonal_win[1]] == "X" && board[right_diagonal_win[2]] == "X" || board[right_diagonal_win[0]] == "O" && board[right_diagonal_win[1]] == "O" && board[right_diagonal_win[2]] == "O"
+elsif board.cells[right_diagonal_win[0]] == "X" && board.cells[right_diagonal_win[1]] == "X" && board.cells[right_diagonal_win[2]] == "X" || board.cells[right_diagonal_win[0]] == "O" && board.cells[right_diagonal_win[1]] == "O" && board.cells[right_diagonal_win[2]] == "O"
     WIN_COMBINATIONS[4]
   end
 end
 
-def play(board)
+def current_player
+  if turn_count % 2 ==  0
+   @player_1
+  else 
+    @player_2
+  end
+end
+
+
+def play
   turn = 0
   until over? == true || turn == 9 
-    turn(board)
+    turn
     turn += 1
   end
   
-  if won?(board)
-    puts "Congratulations #{winner(board)}!"
-  elsif draw?(board)
+  if won?
+    puts "Congratulations #{winner}!"
+  elsif draw?
     puts "Cat's Game!"
   end
 end
 
 
 def full?
-   game.board.all?{|i| i == "X" || i == "O"}
+   board.cells.all?{|i| i == "X" || i == "O"}
 end
  
 def draw?
@@ -81,6 +111,7 @@ def draw?
   false
 end
 end
+
 def over?
   if won? || draw? || full?
     true
@@ -91,9 +122,18 @@ end
 
 def winner
   if won?
-  board[won?(board)[0]]
+  board.cells[won?[0]]
 else
   nil
 end
 end
+
+def position_taken?(board, location)
+  board[location] != " " && board[location] != ""
+end
+
+def valid_move?(board, index)
+  index.between?(0,8) && !position_taken?(board, index)
+end
+
 end
